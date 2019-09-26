@@ -27,14 +27,14 @@ data=data.dropna()
 #print(data.head())
 
 #show graph for any activity
-data[data['activity'] == 'Standing'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Standing')
-data[data['activity'] == 'Jogging'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Jogging')
-plt.xlabel('Timestep')
-plt.ylabel('x acc (dg)')
+#data[data['activity'] == 'Standing'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Standing')
+#data[data['activity'] == 'Jogging'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Jogging')
+#plt.xlabel('Timestep')
+#plt.ylabel('x acc (dg)')
 
 #activity graph
-activity_type = data['activity'].value_counts().plot(kind='bar', title='frequency of activity')
-plt.show()
+#activity_type = data['activity'].value_counts().plot(kind='bar', title='frequency of activity')
+#plt.show()
 
 #data_after_window_segmentation 
 data_after_window_segmentation = []
@@ -52,5 +52,19 @@ for i in range(0,len(data) - time_size_segment,time_step):
 #convert the new data to numpy
 data_after_window_segmentation = np.asarray(data_after_window_segmentation, dtype=np.float32).transpose(0,2,1)   
 labels = np.asarray(pd.get_dummies(labels), dtype=np.float32)
-print("data_after_window_segmentation shape:",data_after_window_segmentation.shape)
-print("labels shape",labels.shape) 
+
+
+
+print(data_after_window_segmentation[:1,:1])
+print(data_after_window_segmentation[0][:1,:1])
+print(len(data_after_window_segmentation))
+
+total_acc = []
+for i in range(0, len(data_after_window_segmentation)):
+    a = np.sqrt(np.sum(np.square(data_after_window_segmentation[:i,:i])))
+        
+    total_acc.append(a)
+        
+
+print(len(total_acc))
+print(total_acc)
