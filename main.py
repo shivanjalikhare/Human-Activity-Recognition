@@ -12,8 +12,7 @@ from scipy import stats
 import numpy as np
 from scipy.stats import skew
 from scipy.stats import kurtosis
-from functools import (reduce)
-from math import (sqrt)
+from scipy.stats import iqr
 
 Column_Names = ['user', 'activity','timestamp','x-axis','y-axis','z-axis']
 Labels = ['Downstairs','Jogging','Sitting','Standing','Upstairs','Walking']
@@ -133,6 +132,30 @@ total_acc_rms = np.sqrt(t_mean_sq)
 #print('y_rms',y_rms)
 #print('z_rms',z_rms)
 #print('total_acc_rms',total_acc_rms)
+
+x_iqr = iqr(x)
+y_iqr = iqr(y)
+z_iqr = iqr(z)
+total_acc_iqr = iqr(total_acc)
+print('x_iqr',x_iqr)
+print('y_iqr',y_iqr)
+print('z_iqr',z_iqr)
+
+print('total_acc_iqr',total_acc_iqr)
+
+x_min = np.amin(x)
+y_min = np.amin(y)
+z_min = np.amin(z)
+total_acc_min = np.amin(total_acc)
+x_max = np.amax(x)
+y_max = np.amax(y)
+z_max = np.amax(z)
+total_acc_max = np.amax(total_acc)
+
+print("x_min  ",x_min,"       y_min   ",y_min,"     z_min  ",z_min, "  total_acc_min  ", total_acc_min)
+print("x_max  ",x_max,"       y_max   ",y_max,"     z_max  ",z_max, "  total_acc_max  ", total_acc_max)
+
+
 
 #print(data_after_window_segmentation[0,0])
 #print(data_after_window_segmentation[:,:,0])
