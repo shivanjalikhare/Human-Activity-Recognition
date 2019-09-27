@@ -157,21 +157,35 @@ print("x_min  ",x_min,"       y_min   ",y_min,"     z_min  ",z_min, "  total_acc
 print("x_max  ",x_max,"       y_max   ",y_max,"     z_max  ",z_max, "  total_acc_max  ", total_acc_max)
 
 
-def Trend(a):
+#find mean trend
+def Mean(a):
     cumsum, moving_aves = [0], []
+    moving_aves_w = []
+    N = 90
     for i, ii in enumerate(a, 1):
         cumsum.append(cumsum[i-1] + ii)
-        if i>=time_size_segment:
-            moving_ave = (cumsum[i] - cumsum[i-time_size_segment])/time_size_segment
+        if i>=N:
+            moving_ave = (cumsum[i] - cumsum[i-N])/N
             #can do stuff with moving_ave here
+            moving_ave += moving_ave
             moving_aves.append(moving_ave)
-            return moving_aves
+            moving_ave_w = moving_ave - np.mean(a)
+            moving_aves_w.append(moving_ave_w)
+            return moving_aves, moving_aves_w
 
-print('x_meanTrend',np.mean(Trend(x)))
-print('y_meanTrend',np.mean(Trend(y)))
-print('z_meanTrend',np.mean(Trend(z)))
-print('z_meanTrend',np.mean(Trend(total_acc)))
-#print('z_meanTrend',z_meanTrend)
+print('x_meanTrend',Mean(x)[0])
+print('y_meanTrend',Mean(y)[0])
+print('z_meanTrend',Mean(z)[0])
+print('total_acc_meanTrend',Mean(total_acc)[0])
+print('x_WindowMeanDifference',Mean(x)[1])
+print('y_WindowMeanDifference',Mean(x)[1])
+print('z_WindowMeanDifference',Mean(x)[1])
+print('total_acc_WindowMeanDifference',Mean(total_acc)[1])
+
+
+
+
+
 
 #print(data_after_window_segmentation[0,0])
 #print(data_after_window_segmentation[:,:,0])
