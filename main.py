@@ -75,6 +75,7 @@ x = data_after_window_segmentation[:,:,0]
 y = data_after_window_segmentation[:,:,1]
 z = data_after_window_segmentation[:,:,2]
 
+
 x_mean = np.mean(x)
 y_mean = np.mean(y)
 z_mean = np.mean(z)
@@ -156,6 +157,21 @@ print("x_min  ",x_min,"       y_min   ",y_min,"     z_min  ",z_min, "  total_acc
 print("x_max  ",x_max,"       y_max   ",y_max,"     z_max  ",z_max, "  total_acc_max  ", total_acc_max)
 
 
+def Trend(a):
+    cumsum, moving_aves = [0], []
+    for i, ii in enumerate(a, 1):
+        cumsum.append(cumsum[i-1] + ii)
+        if i>=time_size_segment:
+            moving_ave = (cumsum[i] - cumsum[i-time_size_segment])/time_size_segment
+            #can do stuff with moving_ave here
+            moving_aves.append(moving_ave)
+            return moving_aves
+
+print('x_meanTrend',np.mean(Trend(x)))
+print('y_meanTrend',np.mean(Trend(y)))
+print('z_meanTrend',np.mean(Trend(z)))
+print('z_meanTrend',np.mean(Trend(total_acc)))
+#print('z_meanTrend',z_meanTrend)
 
 #print(data_after_window_segmentation[0,0])
 #print(data_after_window_segmentation[:,:,0])
