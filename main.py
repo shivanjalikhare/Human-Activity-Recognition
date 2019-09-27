@@ -10,7 +10,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 import numpy as np
-
+from scipy.stats import skew
+from scipy.stats import kurtosis
+from functools import (reduce)
+from math import (sqrt)
 
 Column_Names = ['user', 'activity','timestamp','x-axis','y-axis','z-axis']
 Labels = ['Downstairs','Jogging','Sitting','Standing','Upstairs','Walking']
@@ -28,14 +31,14 @@ data=data.dropna()
 #print(data.head())
 
 #show graph for any activity
-data[data['activity'] == 'Standing'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Standing')
-data[data['activity'] == 'Jogging'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Jogging')
-plt.xlabel('Timestep')
-plt.ylabel('x acc (dg)')
+#data[data['activity'] == 'Standing'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Standing')
+#data[data['activity'] == 'Jogging'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Jogging')
+#plt.xlabel('Timestep')
+#plt.ylabel('x acc (dg)')
 
 #activity graph
-activity_type = data['activity'].value_counts().plot(kind='bar', title='frequency of activity')
-plt.show()
+#activity_type = data['activity'].value_counts().plot(kind='bar', title='frequency of activity')
+#plt.show()
 
 #data_after_window_segmentation 
 data_after_window_segmentation = []
@@ -96,8 +99,40 @@ print('y_var',y_var)
 print('z_var',z_var)
 #print('---------------------------------------------')
 print('total_acc_var',total_acc_var)
+x_covariance = np.cov(x)
+y_covariance = np.cov(y)
+y_covariance = np.cov(y)
+x_skew = skew(x)
+y_skew = skew(y)
+z_skew = skew(z)
+total_acc_skew = skew(total_acc)
+#print('skew',x_skew)
+kurtosis
+x_kurtosis = kurtosis(x)
+y_kurtosis = kurtosis(y)
+z_kurtosis = kurtosis(z)
+total_acc_kurtosis = kurtosis(total_acc)
+#print('kurtosis',len(x_kurtosis))
+x_std = np.std(x)
+y_std = np.std(y)
+z_std = np.std(z)
+total_acc_std = np.std(total_acc)
+#print('x_std',x_std)
 
 
+x_rms = np.sqrt(np.mean(x**2))
+y_rms = np.sqrt(np.mean(y**2))
+z_rms = np.sqrt(np.mean(z**2))
+
+positions = np.cumsum(total_acc, axis=0)
+t_sq = positions**2
+t_mean_sq = np.mean(t_sq, axis= 0)
+total_acc_rms = np.sqrt(t_mean_sq)
+
+#print('x_rms',x_rms)
+#print('y_rms',y_rms)
+#print('z_rms',z_rms)
+#print('total_acc_rms',total_acc_rms)
 
 #print(data_after_window_segmentation[0,0])
 #print(data_after_window_segmentation[:,:,0])
