@@ -13,6 +13,13 @@ import numpy as np
 from scipy.stats import skew
 from scipy.stats import kurtosis
 from scipy.stats import iqr
+from sklearn.model_selection import train_test_split
+# example of training a final classification model
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+
+
+
 
 Column_Names = ['user', 'activity','timestamp','x-axis','y-axis','z-axis']
 Labels = ['Downstairs','Jogging','Sitting','Standing','Upstairs','Walking']
@@ -30,14 +37,14 @@ data=data.dropna()
 #print(data.head())
 
 #show graph for any activity
-#data[data['activity'] == 'Standing'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Standing')
-#data[data['activity'] == 'Jogging'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Jogging')
-#plt.xlabel('Timestep')
-#plt.ylabel('x acc (dg)')
+data[data['activity'] == 'Standing'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Standing')
+data[data['activity'] == 'Jogging'][['x-axis']][:50].plot(subplots=True,figsize=(10,8),title='Jogging')
+plt.xlabel('Timestep')
+plt.ylabel('x acc (dg)')
 
 #activity graph
-#activity_type = data['activity'].value_counts().plot(kind='bar', title='frequency of activity')
-#plt.show()
+activity_type = data['activity'].value_counts().plot(kind='bar', title='frequency of activity')
+plt.show()
 
 #data_after_window_segmentation 
 data_after_window_segmentation = []
@@ -67,15 +74,17 @@ for i in range(0, len(data_after_window_segmentation)):
     a = np.sqrt(np.sum(np.square(data_after_window_segmentation[:i,:i])))
         
     total_acc.append(a)
-    
+
+ 
 #print(len(total_acc))
 #print(total_acc)
         
 x = data_after_window_segmentation[:,:,0]
 y = data_after_window_segmentation[:,:,1]
 z = data_after_window_segmentation[:,:,2]
-
-
+ 
+#print(data_after_window_segmentation[0,0])
+#print(data_after_window_segmentation[:,:,0])
 x_mean = np.mean(x)
 y_mean = np.mean(y)
 z_mean = np.mean(z)
@@ -153,8 +162,10 @@ y_max = np.amax(y)
 z_max = np.amax(z)
 total_acc_max = np.amax(total_acc)
 
-print("x_min  ",x_min,"       y_min   ",y_min,"     z_min  ",z_min, "  total_acc_min  ", total_acc_min)
-print("x_max  ",x_max,"       y_max   ",y_max,"     z_max  ",z_max, "  total_acc_max  ", total_acc_max)
+print("Range x_min  ",x_min ,"x_max,  " ,x_max, "Range y_min" , y_min, "y_max   ", y_max)
+print("Range z_min  ",z_min, "z_max,  ",z_max, "Range  total_acc_min  ", total_acc_min , "total_acc_max  ", total_acc_max)
+
+
 
 
 #find mean trend
@@ -184,11 +195,47 @@ print('total_acc_WindowMeanDifference',Mean(total_acc)[1])
 
 
 
+print(type(total_acc))
+
+print(type(x))
+
+
+def MAE(a):
+    validation_size = 0.20
+    seed = 7
+    X = a[:,0:4]
+    Y = a[:,4]
+    X_train, X_validation, Y_train, Y_validation = train_test_split(X, Y, test_size=validation_size, random_state=seed)
+    LR = LinearRegression()
+    LR.fit(X_train,Y_train)
+    x_predict = LR.predict(X_validation)
+    error = mean_absolute_error(Y_validation, x_predict)
+    return error
+    
+print('x MAE: %.3f' % MAE(x))
+print('z MAE: %.3f' % MAE(y))
+print('y MAE: %.3f' % MAE(z))
+validation_size = 0.20
+seed = 7
+total_acc = np.array(total_acc)
+X_acc = total_acc[0:4]
+Y_acc = total_acc[:4]
+X_train, X_validation, Y_train, Y_validation = train_test_split(X_acc, Y_acc, test_size=validation_size, random_state=seed)
+X_train = X_train.reshape(-1,1)
+Y_train = Y_train.reshape(-1,1)
+X_validation = X_validation.reshape(-1,1)
+Y_validation = Y_validation.reshape(-1,1)
+LR = LinearRegression()
+LR.fit(X_train,Y_train)
+x_predict = LR.predict([[X_validation]])
+acc_error = mean_absolute_error(Y_validation, x_predict)
+print('total_acc MAE: %.3f' % acc_error)
 
 
 
-#print(data_after_window_segmentation[0,0])
-#print(data_after_window_segmentation[:,:,0])
+
+
+
     
 
     
