@@ -58,30 +58,43 @@ for i in range(0,len(data) - time_size_segment,time_step):
     
     label = stats.mode(data['activity'][i: i+time_size_segment])[0][0]
     labels.append(label)
-    
+  
+
 #convert the new data to numpy
 data_after_window_segmentation = np.asarray(data_after_window_segmentation, dtype=np.float32).transpose(0,2,1)   
 labels = np.asarray(pd.get_dummies(labels), dtype=np.float32)
 
 
+#print(data_after_window_segmentation[:1,:1])
+#print(data_after_window_segmentation[0][:1,:1])
+#print(len(data_after_window_segmentation))
 
-print(data_after_window_segmentation[:1,:1])
-print(data_after_window_segmentation[0][:1,:1])
-print(len(data_after_window_segmentation))
-
-total_acc = []
-for i in range(0, len(data_after_window_segmentation)):
-    a = np.sqrt(np.sum(np.square(data_after_window_segmentation[:i,:i])))
-        
-    total_acc.append(a)
-
- 
 #print(len(total_acc))
 #print(total_acc)
-        
+#xyz_points = np.array([])        
 x = data_after_window_segmentation[:,:,0]
 y = data_after_window_segmentation[:,:,1]
 z = data_after_window_segmentation[:,:,2]
+
+xy_acc = np.zeros((10981,180))
+for i in range(len(x)):
+    for j in range(len(x[0])):
+        xy_acc[i][j] = np.square(x[i][j]) + np.square(y[i][j])
+        
+
+        
+#print(xy_acc.shape)   
+#print(xy_acc[:10])    
+xyz_acc = np.zeros((10981,180))
+for i in range(len(xy_acc)):
+    for j in range(len(xy_acc[0])):
+        xyz_acc[i][j] = np.square(xy_acc[i][j]) + np.square(z[i][j])
+        
+#print(xyz_acc.shape)   
+#print(xyz_acc[:10]) 
+total_acc = np.array([])
+total_acc = np.sqrt(xyz_acc)
+#print(total_acc.shape) 
  
 #print(data_after_window_segmentation[0,0])
 #print(data_after_window_segmentation[:,:,0])
@@ -115,33 +128,29 @@ x_skew = skew(x)
 y_skew = skew(y)
 z_skew = skew(z)
 total_acc_skew = skew(total_acc)
-#print('skew',x_skew)
+print('skew',x_skew)
 kurtosis
 x_kurtosis = kurtosis(x)
 y_kurtosis = kurtosis(y)
 z_kurtosis = kurtosis(z)
 total_acc_kurtosis = kurtosis(total_acc)
-#print('kurtosis',len(x_kurtosis))
+print('kurtosis',x_kurtosis)
 x_std = np.std(x)
 y_std = np.std(y)
 z_std = np.std(z)
 total_acc_std = np.std(total_acc)
-#print('x_std',x_std)
+print('x_std',x_std)
 
 
 x_rms = np.sqrt(np.mean(x**2))
 y_rms = np.sqrt(np.mean(y**2))
 z_rms = np.sqrt(np.mean(z**2))
+total_acc_rms = np.sqrt(total_acc)
 
-positions = np.cumsum(total_acc, axis=0)
-t_sq = positions**2
-t_mean_sq = np.mean(t_sq, axis= 0)
-total_acc_rms = np.sqrt(t_mean_sq)
-
-#print('x_rms',x_rms)
-#print('y_rms',y_rms)
-#print('z_rms',z_rms)
-#print('total_acc_rms',total_acc_rms)
+print('x_rms',x_rms)
+print('y_rms',y_rms)
+print('z_rms',z_rms)
+print('total_acc_rms',total_acc_rms)
 
 x_iqr = iqr(x)
 y_iqr = iqr(y)
@@ -150,7 +159,6 @@ total_acc_iqr = iqr(total_acc)
 print('x_iqr',x_iqr)
 print('y_iqr',y_iqr)
 print('z_iqr',z_iqr)
-
 print('total_acc_iqr',total_acc_iqr)
 
 x_min = np.amin(x)
@@ -194,12 +202,6 @@ print('z_WindowMeanDifference',Mean(x)[1])
 print('total_acc_WindowMeanDifference',Mean(total_acc)[1])
 
 
-
-print(type(total_acc))
-
-print(type(x))
-
-
 def MAE(a):
     validation_size = 0.20
     seed = 7
@@ -215,21 +217,7 @@ def MAE(a):
 print('x MAE: %.3f' % MAE(x))
 print('z MAE: %.3f' % MAE(y))
 print('y MAE: %.3f' % MAE(z))
-validation_size = 0.20
-seed = 7
-total_acc = np.array(total_acc)
-X_acc = total_acc[0:4]
-Y_acc = total_acc[:4]
-X_train, X_validation, Y_train, Y_validation = train_test_split(X_acc, Y_acc, test_size=validation_size, random_state=seed)
-X_train = X_train.reshape(-1,1)
-Y_train = Y_train.reshape(-1,1)
-X_validation = X_validation.reshape(-1,1)
-Y_validation = Y_validation.reshape(-1,1)
-LR = LinearRegression()
-LR.fit(X_train,Y_train)
-x_predict = LR.predict([[X_validation]])
-acc_error = mean_absolute_error(Y_validation, x_predict)
-print('total_acc MAE: %.3f' % acc_error)
+print('total_acc MAE: %.3f' % MAE(total_acc))
 
 
 
