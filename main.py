@@ -17,12 +17,15 @@ from sklearn.model_selection import train_test_split
 # example of training a final classification model
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import accuracy_score
+from imblearn.over_sampling import SMOTE
+from sklearn.metrics import confusion_matrix, classification_report
 
 
 
 
 Column_Names = ['user', 'activity','timestamp','x-axis','y-axis','z-axis']
-Labels = ['Downstairs','Jogging','Sitting','Standing','Upstairs','Walking']
+Labels = {1:'Downstairs',2:'Jogging',3:'Sitting',4:'Standing',5:'Upstairs',6:'Walking'}
 Data_path = 'data/WISDM_ar_v1.1_raw.txt'
 
 time_step = 100
@@ -46,7 +49,7 @@ plt.ylabel('x acc (dg)')
 activity_type = data['activity'].value_counts().plot(kind='bar', title='frequency of activity')
 plt.show()
 
-#data_after_window_segmentation 
+
 data_after_window_segmentation = []
 labels = []
 
@@ -64,7 +67,8 @@ for i in range(0,len(data) - time_size_segment,time_step):
 data_after_window_segmentation = np.asarray(data_after_window_segmentation, dtype=np.float32).transpose(0,2,1)   
 labels = np.asarray(pd.get_dummies(labels), dtype=np.float32)
 
-
+print(labels.shape)
+#data[labels].value_counts()
 #print(data_after_window_segmentation[:1,:1])
 #print(data_after_window_segmentation[0][:1,:1])
 #print(len(data_after_window_segmentation))
@@ -94,10 +98,12 @@ for i in range(len(xy_acc)):
 #print(xyz_acc[:10]) 
 total_acc = np.array([])
 total_acc = np.sqrt(xyz_acc)
+
 #print(total_acc.shape) 
  
 #print(data_after_window_segmentation[0,0])
 #print(data_after_window_segmentation[:,:,0])
+
 x_mean = np.mean(x)
 y_mean = np.mean(y)
 z_mean = np.mean(z)
@@ -207,22 +213,50 @@ def MAE(a):
     seed = 7
     X = a[:,0:4]
     Y = a[:,4]
-    X_train, X_validation, Y_train, Y_validation = train_test_split(X, Y, test_size=validation_size, random_state=seed)
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=validation_size, random_state=seed)
     LR = LinearRegression()
     LR.fit(X_train,Y_train)
-    x_predict = LR.predict(X_validation)
-    error = mean_absolute_error(Y_validation, x_predict)
-    return error
+    y_predict = LR.predict(X_test)
+    error = mean_absolute_error(Y_test, y_predict)
+    print('')
+    return error, Y_test, y_predict
     
-print('x MAE: %.3f' % MAE(x))
-print('z MAE: %.3f' % MAE(y))
-print('y MAE: %.3f' % MAE(z))
-print('total_acc MAE: %.3f' % MAE(total_acc))
+print('x MAE: %.3f' % MAE(x)[0])
+print('z MAE: %.3f' % MAE(y)[0])
+print('y MAE: %.3f' % MAE(z)[0])
+print('total_acc MAE: %.3f' % MAE(total_acc)[0])
 
 
 
+def smote(a,l):
+    X = a[:,0:4]
+    Y = l[:,4]
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.3, random_state=0)
+    print(type(X_train))
+    print(y_train.shape)
+    print(type(y_train))
+    print(y_train.shape)
+    print("Number transactions X_train dataset: ", X_train.shape)
+    print("Number transactions y_train dataset: ", y_train.shape)
+    print("Number transactions X_test dataset: ", X_test.shape)
+    print("Number transactions y_test dataset: ", y_test.shape)
+    print("Before OverSampling, counts of label '1': {} \n".format(sum(y_train==1)))
+    print("Before OverSampling, counts of label '0': {} \n".format(sum(y_train==0)))
+    sm = SMOTE(random_state=0,ratio = 1.0)
+  
+    X_train_res, y_train_res = sm.fit_resample(X_train, y_train.ravel()) 
+   
+   
+    print('After OverSampling, the shape of train_X: {}'.format(X_train_res.shape))
+    print('After OverSampling, the shape of train_y: {} \n'.format(y_train_res.shape))
+
+    print("After OverSampling, counts of label '1': {}".format(sum(y_train_res==1)))
+    print("After OverSampling, counts of label '0': {}".format(sum(y_train_res==0)))
+    
 
 
+smote(x,labels)
 
     
 
